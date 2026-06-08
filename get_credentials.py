@@ -12,10 +12,9 @@ def main():
         return
 
     with open(".env", "w") as file:
-        file.write(f"TIDAL_TOKEN_TYPE={session.token_type}\n")
-        file.write(f"TIDAL_ACCESS_TOKEN={session.token_type}\n")
-        file.write(f"TIDAL_REFRESH_TOKEN={session.refresh_token}\n")
-        file.write(f"TIDAL_EXPIRY_TIME-{session.expiry_time}\n")
+        file.write(f"TIDAL_TOKEN_TYPE=\"{session.token_type}\"\n")
+        file.write(f"TIDAL_ACCESS_TOKEN=\"{session.access_token}\"\n")
+        file.write(f"TIDAL_REFRESH_TOKEN=\"{session.refresh_token}\"\n")
     
     print("Success in generating .env file!")
 
