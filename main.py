@@ -1,6 +1,6 @@
 import os
 import sys
-from random import choice
+from random import choice, sample, shuffle
 from typing import List, Optional
 from tidalapi import Session, Artist, Album, Track
 
@@ -40,21 +40,15 @@ def fetch_artists(session : Session) -> List[Artist]:
         return []
 
 
-def get_random_artist(artists : List[Artist]) -> Optional[Artist]:
-    if not artists:
-        return None
-    return choice(artists)
-
-
-def get_random_similar_artist(artist: Artist) -> Optional[Artist]:
+def get_similar_artists(artist: Artist) -> List[Artist]:
     try:
         similar = artist.get_similar()
         if similar:
-            return choice(similar)
-        return None
+            return similar
+        return []
     except Exception as e:
-        print(f"Error while getting similar artist: {e}")
-        return None
+        print(f"Error while getting similar artist for {artist.name}: {e}")
+        return []
     
 
 def get_albums(artist: Artist) -> List[Album]:
@@ -95,6 +89,7 @@ def get_album_tracks(album: Album) -> List[Track]:
         print(f"Error while getting tracks from album {album.name}: {e}")
         return []
 
+
 def main() -> None:
     session = Session()
     if not login(session):
@@ -106,15 +101,30 @@ def main() -> None:
         print("Could not fetch any artists. Exiting")
         sys.exit(1)
     
-    random_artists = []
+    shuffle(artists)
 
-    for _ in range(ARTIST_COUNT):        
-        artist = get_random_artist(artists)
-        random_artists.append(artist)
+    TARGET_ARTIST_COUNT = 5
+    SIMILAR_COUNT_PER_ARTIST = 3
 
-    for artist in random_artists:
-        print(f"{artist.name}")
-
+    selected_data = {}
+    for artist in artists:
+        if len(selected_data) >= TARGET_ARTIST_COUNT:
+            break
+        
+        similar_list = get_similar_artists(artist)
+        if len(similar_list) >= SIMILAR_COUNT_PER_ARTIST:
+            chosen_similar = sample(similar_list, SIMILAR_COUNT_PER_ARTIST)
+            selected_data[artist] = chosen_similar
+        else:
+            continue
+    
+    if len(selected_data) < TARGET_ARTIST_COUNT:
+        print(f"Warning: Could only find {len(selected_data)} artists with enough similar artists")
+    
+    for list in selected_data.values():
+        for artist in list:
+            print(f"{artist.name}")
+        
 
 if __name__ == "__main__":
     main()
