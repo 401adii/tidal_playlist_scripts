@@ -53,26 +53,19 @@ def get_similar_artists(artist: Artist) -> List[Artist]:
 
 def get_albums(artist: Artist) -> List[Album]:
     if not artist:
-        return None
+        return []
     
     try:
         albums = artist.get_albums()
     
         if not albums:
-            print(f"No albums have been found")
-            return None
+            print(f"No albums have been found for {artist.name}")
+            return []
     
         return albums
     except Exception as e:
         print(f"Error while getting albums: {e}")
         return []
-
-
-def get_random_album(albums: List[Album]) -> Optional[Album]:
-    if not albums:
-        return None
-   
-    return choice(albums)
     
 
 def get_album_tracks(album: Album) -> List[Track]:
@@ -83,7 +76,6 @@ def get_album_tracks(album: Album) -> List[Track]:
             print(f"Could not get any tracks from album {album.name}")
             return []
 
-        print("Getting tracks successful")
         return tracks
     except Exception as e:
         print(f"Error while getting tracks from album {album.name}: {e}")
@@ -103,8 +95,8 @@ def main() -> None:
     
     shuffle(artists)
 
-    TARGET_ARTIST_COUNT = 5
-    SIMILAR_COUNT_PER_ARTIST = 3
+    TARGET_ARTIST_COUNT = 10
+    SIMILAR_COUNT_PER_ARTIST = 5
 
     selected_data = {}
     for artist in artists:
@@ -121,10 +113,44 @@ def main() -> None:
     if len(selected_data) < TARGET_ARTIST_COUNT:
         print(f"Warning: Could only find {len(selected_data)} artists with enough similar artists")
     
-    for list in selected_data.values():
-        for artist in list:
-            print(f"{artist.name}")
+    track_ids_to_add = []
+
+    for similar_artists_list in selected_data.values():
+        for artist in similar_artists_list:
+            albums = get_albums(artist)
+
+            if not albums:
+                continue
+
+            random_album = choice(albums)
+            tracks = get_album_tracks(random_album)
+
+            if not tracks:
+                continue
+            
+            random_track = choice(tracks)
+
+            track_ids_to_add.append(random_track.id)
+            print(f"Queued for playlist: {random_track.name} by {artist.name}")
         
+    if not track_ids_to_add:
+        print("\nNo tracks were found. Exiting")
+        sys.exit(1)
+    
+    try:
+        playlist_name = "discover mix"
+        playlist_desc = "python auto discovery script testing"
+
+        print(f"\nCreating playlist: '{playlist_name}")
+
+        new_playlist = session.user.create_playlist(playlist_name, playlist_desc)
+        new_playlist.add(track_ids_to_add)
+        
+        print(f"Success! Added {len(track_ids_to_add)} tracks to the playlist")
+    except Exception as e:
+        print(f"\nError while creating playlist: {e}")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
