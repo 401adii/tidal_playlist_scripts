@@ -8,6 +8,7 @@ class TidalAlgorithms:
 
     def followed_artists_mix(self, artist_count: int = None, track_count: int = 5) -> None:
         #needs adjustments
+        #needs handling eps and singles
         print("Running Followed Artist playlist generation")
 
         artists = self._client.fetch_favorite_artists()
@@ -28,7 +29,7 @@ class TidalAlgorithms:
             albums = self._client.get_albums(artist)
 
             if not albums:
-                print(f"No albums found for {albums.name}")
+                print(f"No albums found for {artist.name}")
                 continue
 
             artist_track_pool = []

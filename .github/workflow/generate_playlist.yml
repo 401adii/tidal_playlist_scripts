@@ -1,0 +1,56 @@
+name: Generate Tidal Playlist
+
+on:
+  schedule:
+    - cron '0 * * * *'
+
+  workflow_dispatch:
+      inputs:
+        algorithm:
+          description: 'Which algorithm to run?'
+          required: true
+          default: 'followed'
+          type: choice
+          options:
+            - followed
+            - similar
+        artist_count:
+          description: 'Number of artists (Type 0 for ALL)'
+          required: false
+          default: '0'
+          type: string
+        track_count:
+          description: 'Number of tracks per artist (Type 0 for ALL)'
+          required: false
+          default: '5'
+          type: string
+  
+jobs:
+  run-playlist-generator:
+    runs-on: ubuntu-latest
+
+    env: 
+      TIDAL_TOKEN_TYPE: ${{ secrets.TIDAL_TOKEN_TYPE }}
+      TIDAL_ACCESS_TOKEN: ${{ secrets.TIDAL_ACCESS_TOKEN }}
+      TIDAL_REFRESH_TOKEN: ${{ secrets.TIDAL_REFRESH_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+
+      - name: Run Algorithm (Automated Schedule)
+        if: github.event_name == 'schedule'
+        run: uv run main.py followed --tracks 5
+
+      - name: Run Algorithm (Manual Trigger)
+        if: github.event_name == 'workflow_dispatch'
+        
+        run: |
+          uv run main.py ${{ inputs.algorithm }} \
+            --artists ${{ inputs.artist_count }} \
+            --tracks ${{ inputs.track_count }}
