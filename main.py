@@ -1,7 +1,7 @@
 import sys
 import argparse
 from client import TidalClient
-from algorithms import similar_artists
+from algorithms import TidalAlgorithms
 
 def main():
     parser = argparse.ArgumentParser(description="Generate Tidal Playlists automatically")
@@ -16,15 +16,16 @@ def main():
     args = parser.parse_args()
     
     client = TidalClient()
+    algorithms = TidalAlgorithms(client=client)
 
     if not client.is_logged_in:
         print("Could not initialize Tidal session. Exiting")
         sys.exit(1)
 
     if args.algorithm == "similar":
-        similar_artists.generate_playlist(client)
-    elif args.algorithm == "followed":
         print("WIP")
+    elif args.algorithm == "followed":
+        algorithms.followed_aritsts_mix()
         
 
 
