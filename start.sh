@@ -11,4 +11,4 @@ if [ ! -f "$FILE" ]; then
     fi
 fi
 
-uv run --env-file .env main.py "$1"
+uv run --env-file .env main.py "$@"

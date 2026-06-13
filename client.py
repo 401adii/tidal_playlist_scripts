@@ -54,14 +54,6 @@ class TidalClient:
             return []
 
 
-    def fetch_artists(self) -> List[Artist]:
-        try:
-            return self.session.user.favorites.artists()
-        except Exception as e:
-            print(f"Error while fetching artits: {e}")
-            return []
-
-
     def get_similar_artists(self, artist: Artist) -> List[Artist]:
         try:
             similar = artist.get_similar()
@@ -73,7 +65,7 @@ class TidalClient:
             return []
         
 
-    def get_albums(artist: Artist) -> List[Album]:
+    def get_albums(self, artist: Artist) -> List[Album]:
         if not artist:
             return []
         
@@ -90,7 +82,7 @@ class TidalClient:
             return []
         
 
-    def get_album_tracks(album: Album) -> List[Track]:
+    def get_album_tracks(self, album: Album) -> List[Track]:
         try:
             tracks = album.tracks()
 
@@ -102,3 +94,17 @@ class TidalClient:
         except Exception as e:
             print(f"Error while getting tracks from album {album.name}: {e}")
             return []
+        
+    def create_playlist(self, playlist_name: str, playlist_desc: str, tracks: List[Track]) -> None:
+        if not tracks:
+            print("Track list is empty. Aborting playlist generation")
+            return
+        
+        try:
+            playlist = self.session.user.create_playlist(playlist_name, playlist_desc)
+            track_ids = [track.id for track in tracks]
+
+            playlist.add(track_ids)
+            print(f"Created playlist {playlist.name} with {len(track_ids)} tracks.")
+        except Exception as e:
+            print(f"Error while creating playlist: {e}")
