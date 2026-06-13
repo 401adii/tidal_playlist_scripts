@@ -2,7 +2,7 @@ name: Generate Tidal Playlist
 
 on:
   schedule:
-    - cron '0 * * * *'
+    - cron '0 0 * * *'
 
   workflow_dispatch:
       inputs:
@@ -49,7 +49,7 @@ jobs:
 
       - name: Run Algorithm (Manual Trigger)
         if: github.event_name == 'workflow_dispatch'
-        
+
         run: |
           uv run main.py ${{ inputs.algorithm }} \
             --artists ${{ inputs.artist_count }} \
