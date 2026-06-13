@@ -8,8 +8,9 @@ class TidalAlgorithms:
     def __init__(self, client: TidalClient):
         self._client = client
 
-    def followed_aritsts_mix(self):
-        pass
+
+    def followed_aritsts_mix(self, artist_count: int = None, track_count: int = 5) -> None:
+        print("Running Followed Artist playlist generation")
 
 
 

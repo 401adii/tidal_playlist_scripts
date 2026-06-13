@@ -8,6 +8,7 @@ class TidalClient:
         self.session = Session()
         self.is_logged_in = self._login()
 
+
     def _login(self) -> bool:
         token_type = os.getenv("TIDAL_TOKEN_TYPE")
         access_token = os.getenv("TIDAL_ACCESS_TOKEN")
@@ -32,13 +33,15 @@ class TidalClient:
         except Exception as e:
             print(f"Error while logging in: {e}")
             return False
-    
+
+
     def fetch_favorite_artists(self) -> List[Artist]:
         try:
             return self.session.user.favorites.artists()
         except Exception as e:
             print(f"Error while fetching artists: {e}")
             return []
+
 
     def get_similar_artists(self, artist: Artist) -> List[Artist]:
         try:
