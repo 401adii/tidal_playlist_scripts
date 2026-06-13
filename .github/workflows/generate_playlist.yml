@@ -45,7 +45,7 @@ jobs:
 
       - name: Run Algorithm (Automated Schedule)
         if: github.event_name == 'schedule'
-        run: uv run main.py followed --tracks 5
+        run: uv run main.py followed --tracks 5 --artists 10
 
       - name: Run Algorithm (Manual Trigger)
         if: github.event_name == 'workflow_dispatch'
