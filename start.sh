@@ -1,7 +1,9 @@
+#!/bin/bash
+
 FILE="./.env"
 
 if [ ! -f "$FILE" ]; then
-    echo ".env file not find, runnnig get_credentials.py"
+    echo ".env file not found, runnning get_credentials.py"
     uv run get_credentials.py
 
     if [ ! -f "$FILE" ]; then
