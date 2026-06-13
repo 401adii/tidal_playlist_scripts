@@ -45,7 +45,7 @@ def main():
     if args.algorithm == "similar":
         print("WIP")
     elif args.algorithm == "followed":
-        algorithms.followed_artists_mix(artist_count=args.artists, track_count=args.track)
+        algorithms.followed_artists_mix(artist_count=args.artists, track_count=args.tracks)
         
 
 

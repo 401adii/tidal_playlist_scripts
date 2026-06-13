@@ -1,16 +1,78 @@
 from client import TidalClient
 from random import shuffle, sample, choice
 
-TARGET_ARTIST_COUNT = 10
-SIMILAR_COUNT_PER_ARTIST = 5
-
 class TidalAlgorithms:
     def __init__(self, client: TidalClient):
         self._client = client
 
 
-    def followed_aritsts_mix(self, artist_count: int = None, track_count: int = 5) -> None:
+    def followed_artists_mix(self, artist_count: int = None, track_count: int = 5) -> None:
+        #needs adjustments
         print("Running Followed Artist playlist generation")
+
+        artists = self._client.fetch_favorite_artists()
+        shuffle(artists)
+
+        if artist_count is not None:
+            count = min(artist_count, len(artists))   
+            artists = sample(artists, count)
+        
+        if not artists:
+            print("Artist list is empty. Aborting.")
+            return
+        
+        final_tracks = []
+        seen_track_ids = set()
+
+        for artist in artists:
+            albums = self._client.get_albums(artist)
+
+            if not albums:
+                print(f"No albums found for {albums.name}")
+                continue
+
+            artist_track_pool = []
+
+            if track_count == 0:
+                albums_to_fetch = albums
+            else:
+                albums_sample_size = min(track_count, len(albums))
+                albums_to_fetch = sample(albums, albums_sample_size)
+
+            for album in albums_to_fetch:
+                artist_track_pool.extend(self._client.get_album_tracks(album))
+
+            if track_count == 0:
+                selected_tracks = artist_track_pool
+            else:
+                count = min(track_count, len(artist_track_pool))
+                selected_tracks = sample(artist_track_pool, count)
+            
+            for track in selected_tracks:
+                if track.id not in seen_track_ids:
+                    seen_track_ids.add(track.id)
+                    final_tracks.append(track)
+                    print(f"+ Queued track {track.name}")
+                else:
+                    print(f"- Skipped duplicate: {track.name}")
+
+        if final_tracks:
+            shuffle(final_tracks)
+
+            playlist_name = "Followed Daily Mix"
+            playlist_desc = "Python script testing"
+            self._client.create_playlist(
+                playlist_name,
+                playlist_desc,
+                final_tracks
+            ) 
+        else:
+            print("No valid tracks were found to add")
+
+
+                
+
+        
 
 
 
